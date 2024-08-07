@@ -8,19 +8,12 @@ import android.widget.EditText;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import org.w3c.dom.Text;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -47,11 +40,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         goButton.setOnClickListener(this);
     }
-    float split2(float cost) {
-        return cost / 2;
+    double split2(double cost) {
+        return (double) Math.round((cost / 2) * 100) / 100;
     }
-    float split3(float cost) {
-        return cost / 3;
+    double split3(double cost) {
+        return (double) Math.round((cost / 3) * 100) / 100;
     }
 
     @Override
@@ -80,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this,"check at least one payer", Toast.LENGTH_SHORT).show();
         } else {
             String itemNameText = itemName.getText().toString();
-            float itemCostFloat = Float.parseFloat(itemCost.getText().toString());
+            double itemCostDouble = Double.parseDouble(itemCost.getText().toString());
             LocalDate currentDate = LocalDate.now();
 
             dateText.setText(currentDate.format(DateTimeFormatter.ofPattern("dd/MM")));
@@ -89,39 +82,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (checkedList.size() == 1) {
                 switch (checkedList.get(0)) {
                     case 1:
-                        costText1.setText(String.valueOf(itemCostFloat));
+                        costText1.setText(String.valueOf(itemCostDouble));
                         break;
                     case 2:
-                        costText2.setText(String.valueOf(itemCostFloat));
+                        costText2.setText(String.valueOf(itemCostDouble));
                         break;
                     case 3:
-                        costText3.setText(String.valueOf(itemCostFloat));
+                        costText3.setText(String.valueOf(itemCostDouble));
                         break;
                 }
             } else if (checkedList.size() == 2) {
                 switch (checkedList.get(0)) {
                     case 1:
-                        costText1.setText(String.valueOf(split2(itemCostFloat)));
+                        costText1.setText(String.valueOf(split2(itemCostDouble)));
                         break;
                     case 2:
-                        costText2.setText(String.valueOf(split2(itemCostFloat)));
+                        costText2.setText(String.valueOf(split2(itemCostDouble)));
                         break;
                     case 3:
-                        costText3.setText(String.valueOf(split2(itemCostFloat)));
+                        costText3.setText(String.valueOf(split2(itemCostDouble)));
                         break;
                 }
                 switch (checkedList.get(1)) {
                     case 2:
-                        costText2.setText(String.valueOf(split2(itemCostFloat)));
+                        costText2.setText(String.valueOf(split2(itemCostDouble)));
                         break;
                     case 3:
-                        costText3.setText(String.valueOf(split2(itemCostFloat)));
+                        costText3.setText(String.valueOf(split2(itemCostDouble)));
                         break;
                 }
             } else {
-                costText1.setText(String.valueOf(split3(itemCostFloat)));
-                costText2.setText(String.valueOf(split3(itemCostFloat)));
-                costText3.setText(String.valueOf(split3(itemCostFloat)));
+                costText1.setText(String.valueOf(split3(itemCostDouble)));
+                costText2.setText(String.valueOf(split3(itemCostDouble)));
+                costText3.setText(String.valueOf(split3(itemCostDouble)));
             }
         }
 
