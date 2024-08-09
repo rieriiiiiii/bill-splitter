@@ -3,7 +3,7 @@ package com.example.myapplication;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.EditText;
 import android.widget.Button;
 import android.widget.Toast;
@@ -20,7 +20,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText itemName, itemCost;
     CheckBox payer1, payer2, payer3;
     Button goButton;
-    TextView dateText, nameText, costText1, costText2, costText3;
+    List<String> dateList = new ArrayList<>();
+    List<String> nameList = new ArrayList<>();
+    List<String> costList1 = new ArrayList<>();
+    List<String> costList2 = new ArrayList<>();
+    List<String> costList3 = new ArrayList<>();
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,27 +37,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         payer2 = findViewById(R.id.split_2);
         payer3 = findViewById(R.id.split_3);
         goButton = findViewById(R.id.button_go);
-        dateText = findViewById(R.id.date);
-        nameText = findViewById(R.id.name_text);
-        costText1 = findViewById(R.id.cost_1);
-        costText2 = findViewById(R.id.cost_2);
-        costText3 = findViewById(R.id.cost_3);
 
         goButton.setOnClickListener(this);
     }
     double split2(double cost) {
         return (double) Math.round((cost / 2) * 100) / 100;
     }
-    double split3(double cost) {
-        return (double) Math.round((cost / 3) * 100) / 100;
-    }
+    double split3(double cost) { return (double) Math.round((cost / 3) * 100) / 100; }
 
     @Override
     public void onClick(View view) {
         // temp until i figure out how to make the text persist
-        costText1.setText("");
-        costText2.setText("");
-        costText3.setText("");
+        //costText1.setText("");
+        //.setText("");
+        //costText3.setText("");
 
         List<Integer> checkedList = new ArrayList<>();
         if (payer1.isChecked()) {
@@ -76,47 +74,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double itemCostDouble = Double.parseDouble(itemCost.getText().toString());
             LocalDate currentDate = LocalDate.now();
 
-            dateText.setText(currentDate.format(DateTimeFormatter.ofPattern("dd/MM")));
-            nameText.setText(itemNameText);
+            dateList.add(currentDate.format(DateTimeFormatter.ofPattern("dd/MM")));
+            nameList.add(itemNameText);
 
             if (checkedList.size() == 1) {
                 switch (checkedList.get(0)) {
                     case 1:
-                        costText1.setText(String.valueOf(itemCostDouble));
+                        costList1.add(String.valueOf(itemCostDouble));
+                        costList2.add("");
+                        costList3.add("");
                         break;
                     case 2:
-                        costText2.setText(String.valueOf(itemCostDouble));
+                        costList2.add(String.valueOf(itemCostDouble));
+                        costList1.add("");
+                        costList3.add("");
                         break;
                     case 3:
-                        costText3.setText(String.valueOf(itemCostDouble));
+                        costList3.add(String.valueOf(itemCostDouble));
+                        costList1.add("");
+                        costList2.add("");
                         break;
                 }
             } else if (checkedList.size() == 2) {
-                switch (checkedList.get(0)) {
-                    case 1:
-                        costText1.setText(String.valueOf(split2(itemCostDouble)));
-                        break;
-                    case 2:
-                        costText2.setText(String.valueOf(split2(itemCostDouble)));
-                        break;
-                    case 3:
-                        costText3.setText(String.valueOf(split2(itemCostDouble)));
-                        break;
-                }
-                switch (checkedList.get(1)) {
-                    case 2:
-                        costText2.setText(String.valueOf(split2(itemCostDouble)));
-                        break;
-                    case 3:
-                        costText3.setText(String.valueOf(split2(itemCostDouble)));
-                        break;
+                if (checkedList.get(0) == 1) {
+                    if (checkedList.get(1) == 2) {
+                        costList1.add(String.valueOf(split2(itemCostDouble)));
+                        costList2.add(String.valueOf(split2(itemCostDouble)));
+                        costList3.add("");
+                    } else {
+                        costList1.add(String.valueOf(split2(itemCostDouble)));
+                        costList3.add(String.valueOf(split2(itemCostDouble)));
+                        costList2.add("");
+                    }
+                } else {
+                    costList2.add(String.valueOf(split2(itemCostDouble)));
+                    costList3.add(String.valueOf(split2(itemCostDouble)));
+                    costList1.add("");
                 }
             } else {
-                costText1.setText(String.valueOf(split3(itemCostDouble)));
-                costText2.setText(String.valueOf(split3(itemCostDouble)));
-                costText3.setText(String.valueOf(split3(itemCostDouble)));
+                costList1.add(String.valueOf(split3(itemCostDouble)));
+                costList2.add(String.valueOf(split3(itemCostDouble)));
+                costList3.add(String.valueOf(split3(itemCostDouble)));
             }
         }
 
+        listView = findViewById(R.id.splitListView);
+        SplitBaseAdapter splitBaseAdapter = new SplitBaseAdapter(getApplicationContext(), dateList, nameList, costList1, costList2, costList3);
+        listView.setAdapter(splitBaseAdapter);
     }
 }
