@@ -1,7 +1,11 @@
 package com.example.myapplication;
 
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.EditText;
@@ -26,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<String> costList2 = new ArrayList<>();
     List<String> costList3 = new ArrayList<>();
     ListView listView;
+    Builder alert;
+    SplitBaseAdapter splitBaseAdapter;
+    List<Integer> checkedItemsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +46,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         goButton = findViewById(R.id.button_go);
 
         goButton.setOnClickListener(this);
+
+        splitBaseAdapter = new SplitBaseAdapter(getApplicationContext(), dateList, nameList, costList1, costList2, costList3);
+        listView = findViewById(R.id.splitListView);
+        alert = new Builder(MainActivity.this);
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                alert.setMessage("confirm delete ?");
+                alert.setCancelable(true);
+                alert.setPositiveButton("yes", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int u) {
+
+                        // check if checked item is after clicked item, if so decreases index by 1
+//                        for (int x = 0; x < checkedItemsList.size(); x++) {
+//                            if (checkedItemsList.get(x) > i) {
+//                                checkedItemsList.add(checkedItemsList.get(x) - 1);
+//                                checkedItemsList.remove
+//                            }
+//                        }
+
+                        dateList.remove(i);
+                        nameList.remove(i);
+                        costList1.remove(i);
+                        costList2.remove(i);
+                        costList3.remove(i);
+                        splitBaseAdapter.notifyDataSetChanged();
+                        dialog.dismiss();
+
+                    }
+                });
+                alert.setNegativeButton("no", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int u) {
+                        dialog.cancel();
+                    }
+                });
+
+                alert.show();
+                return true;
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (checkedItemsList.contains(i)) {
+                    listView.getChildAt(i).setBackgroundColor(Color.parseColor("#ffffff"));
+                    checkedItemsList.remove(Integer.valueOf(i));
+                } else {
+                    listView.getChildAt(i).setBackgroundColor(Color.parseColor("#f2f2f2"));
+                    checkedItemsList.add(i);
+                }
+            }
+        });
+
     }
     double split2(double cost) {
         return (double) Math.round((cost / 2) * 100) / 100;
@@ -118,8 +184,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        listView = findViewById(R.id.splitListView);
-        SplitBaseAdapter splitBaseAdapter = new SplitBaseAdapter(getApplicationContext(), dateList, nameList, costList1, costList2, costList3);
         listView.setAdapter(splitBaseAdapter);
+
     }
+
 }
