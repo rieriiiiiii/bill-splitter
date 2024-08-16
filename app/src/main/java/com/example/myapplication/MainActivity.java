@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Builder alert;
     SplitBaseAdapter splitBaseAdapter;
     List<Integer> checkedItemsList = new ArrayList<>();
+    DatabaseHelper billDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,36 +53,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         listView = findViewById(R.id.splitListView);
         alert = new Builder(MainActivity.this);
 
+        billDatabase = new DatabaseHelper(this);
+
+        Cursor res = billDatabase.getData();
+        while (res.moveToNext()) {
+            dateList.add(res.getString(1));
+            nameList.add(res.getString(2));
+            costList1.add(res.getString(3));
+            costList2.add(res.getString(4));
+            costList3.add(res.getString(5));
+        }
+
+        listView.setAdapter(splitBaseAdapter);
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 alert.setMessage("confirm delete ?");
                 alert.setCancelable(true);
-                alert.setPositiveButton("yes", new DialogInterface.OnClickListener() {
 
+                alert.setPositiveButton("yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int u) {
-
-                        // check if checked item is after clicked item, if so decreases index by 1
-//                        for (int x = 0; x < checkedItemsList.size(); x++) {
-//                            if (checkedItemsList.get(x) > i) {
-//                                checkedItemsList.add(checkedItemsList.get(x) - 1);
-//                                checkedItemsList.remove
-//                            }
-//                        }
 
                         dateList.remove(i);
                         nameList.remove(i);
                         costList1.remove(i);
                         costList2.remove(i);
                         costList3.remove(i);
+
+                        Cursor index = billDatabase.getData();
+                        int idNum;
+                        int inc = 0;
+                        while (index.moveToNext()) {
+                            if (inc == i) {
+                                idNum = index.getInt(0);
+                                billDatabase.deleteData(idNum);
+                            }
+                            inc++;
+                        }
+
                         splitBaseAdapter.notifyDataSetChanged();
                         dialog.dismiss();
 
                     }
                 });
-                alert.setNegativeButton("no", new DialogInterface.OnClickListener() {
 
+                alert.setNegativeButton("no", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int u) {
                         dialog.cancel();
@@ -92,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+// TODO: add a "checked" tag to SQL to persist grey out
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -113,10 +133,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        // temp until i figure out how to make the text persist
-        //costText1.setText("");
-        //.setText("");
-        //costText3.setText("");
 
         List<Integer> checkedList = new ArrayList<>();
         if (payer1.isChecked()) {
@@ -182,10 +198,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 costList2.add(String.valueOf(split3(itemCostDouble)));
                 costList3.add(String.valueOf(split3(itemCostDouble)));
             }
+
+            billDatabase.insertData(dateList.get(dateList.size() - 1), nameList.get(nameList.size() - 1), costList1.get(costList1.size() - 1), costList2.get(costList2.size() - 1), costList3.get(costList3.size() - 1));
         }
 
-        listView.setAdapter(splitBaseAdapter);
-
+        splitBaseAdapter.notifyDataSetChanged();
     }
 
 }
