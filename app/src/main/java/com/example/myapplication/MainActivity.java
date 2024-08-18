@@ -112,18 +112,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
 // TODO: add a "checked" tag to SQL to persist grey out
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (checkedItemsList.contains(i)) {
-                    listView.getChildAt(i).setBackgroundColor(Color.parseColor("#ffffff"));
-                    checkedItemsList.remove(Integer.valueOf(i));
-                } else {
-                    listView.getChildAt(i).setBackgroundColor(Color.parseColor("#f2f2f2"));
-                    checkedItemsList.add(i);
-                }
-            }
-        });
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                if (checkedItemsList.contains(i)) {
+//                    listView.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+//                    checkedItemsList.remove(Integer.valueOf(i));
+//                } else {
+//                    listView.getChildAt(i).setBackgroundColor(Color.parseColor("#f2f2f2"));
+//                    checkedItemsList.add(i);
+//                }
+//            }
+//        });
 
     }
     double split2(double cost) {
